@@ -1,273 +1,242 @@
----
-title: PusulamNet
-emoji: 🧭
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
+# PusulamNet
 
-# PusulamNet - Student Exam Tracking & Analysis System
+PusulamNet is a personal web application for tracking practice exams, planning study sessions, and reviewing progress for Turkish national exams.
 
----
+Live application: https://pusulamnet-1.onrender.com
 
-## Table of Contents / İçindekiler
+## Table of Contents
 
-- [English Section](#english-section)
+- [English](#english)
   - [Overview](#overview)
-  - [Key Features](#key-features)
-  - [Application Screenshots](#application-screenshots)
-  - [Project Architecture](#project-architecture)
-  - [Tech Stack](#tech-stack)
-  - [Quick Start & Setup](#quick-start--setup)
-  - [Running Tests](#running-tests)
-  - [Database & Configuration](#database--configuration)
-  - [Security & Deployment](#security--deployment)
-  - [License](#license)
-- [Türkçe Bölüm](#türkçe-bölüm)
+  - [Features](#features)
+  - [Supported Exams](#supported-exams)
+  - [Architecture](#architecture)
+  - [Technology](#technology)
+  - [Local Setup](#local-setup)
+  - [Configuration](#configuration)
+  - [Tests](#tests)
+  - [Deployment and Security](#deployment-and-security)
+- [Türkçe](#türkçe)
   - [Genel Bakış](#genel-bakış)
-  - [Öne Çıkan Özellikler](#öne-çıkan-özellikler)
-  - [Uygulama Ekran Görüntüleri](#uygulama-ekran-görüntüleri)
-  - [Proje Mimarisi](#proje-mimarisi)
-  - [Teknoloji Yığını](#teknoloji-yığını)
-  - [Hızlı Başlangıç & Kurulum](#hızlı-başlangıç--kurulum)
-  - [Testleri Çalıştırma](#testleri-çalıştırma)
-  - [Veritabanı ve Yapılandırma](#veritabanı-ve-yapılandırma)
-  - [Güvenlik ve Canlıya Alma](#güvenlik-ve-canlıya-alma)
-  - [Lisans](#lisans)
+  - [Özellikler](#özellikler)
+  - [Desteklenen Sınavlar](#desteklenen-sınavlar)
+  - [Mimari](#mimari)
+  - [Teknolojiler](#teknolojiler)
+  - [Yerelde Çalıştırma](#yerelde-çalıştırma)
+  - [Yapılandırma](#yapılandırma)
+  - [Testler](#testler)
+  - [Yayınlama ve Güvenlik](#yayınlama-ve-güvenlik)
 
----
-
-## English Section
+## English
 
 ### Overview
-PusulamNet is a full-stack student practice exam tracking, statistical analytics, and study planning web platform. It automatically calculates net scores based on exam-specific wrong-to-right penalty ratios, tracks moving averages, generates rule-based analytical feedback, provides official exam countdowns, study timers (Pomodoro/Stopwatch), and a course note notebook with to-do task planning.
 
-### Key Features
-- Automatic Net Score Calculation: Configurable penalty divisors per exam type (e.g. 4 wrong 1 right, 3 wrong 1 right).
-- Statistical Performance Analytics: Moving averages, standard deviation stability classification (Stable, Moderately Volatile, Volatile), and trend evaluation.
-- Rule-Based Automated Feedback Engine: Algorithmic text evaluation engine providing objective, constructive feedback summaries based on statistical threshold rules.
-- Exam & Focus Timers: Official Exam Countdown Timer (auto-populates exam duration upon completion), Pomodoro Focus Timer, and Lap/Course Stopwatch.
-- Subject Notes Notebook & Study Planner: Course-categorized note taker and prioritized to-do task list.
-- Official Exam Countdown: Dynamic countdown widget tracking upcoming ÖSYM and MEB official exam dates.
-- Data Export: Export practice exam history and general performance summaries to CSV and Excel (.xlsx) formats.
-- Fully Responsive Interface: Dark/Light mode support, modern glassmorphism design system, and custom modal dialogs.
+PusulamNet helps students record correct, incorrect, and unanswered questions from practice exams; calculate net scores; observe progress through charts; and organize study tasks and notes in one place. It is designed as a responsive web application that can also be installed on a phone or tablet as a Progressive Web App.
 
-### Application Screenshots
+### Features
 
-<img width="1571" height="1007" alt="Ekran görüntüsü 2026-08-14 165618" src="https://github.com/user-attachments/assets/524b205f-ab31-463c-ada2-0951ba73f3f1" /><img width="1894" height="1065" alt="Ekran görüntüsü 2026-08-14 165605" src="https://github.com/user-attachments/assets/9f9653f3-ec87-4eea-8e72-b04fea40e9e0" />
-<img width="351" height="385" alt="Ekran görüntüsü 2026-08-14 165744" src="https://github.com/user-attachments/assets/75a191fa-ad72-4ab0-9cdb-423bf1a4b0e8" />
-<img width="1914" height="1072" alt="Ekran görüntüsü 2026-08-14 165736" src="https://github.com/user-attachments/assets/da3f79eb-32a3-4ece-930e-396cd2c36ce7" />
-<img width="1910" height="1073" alt="Ekran görüntüsü 2026-08-14 165729" src="https://github.com/user-attachments/assets/a45886fd-7030-4a3d-b44f-9fd8f95464b0" />
-<img width="1893" height="1073" alt="Ekran görüntüsü 2026-08-14 165711" src="https://github.com/user-attachments/assets/b260064f-3f26-4892-8034-b5b8738a6294" /><img width="1892" height="1068" alt="Ekran görüntüsü 2026-08-14 165631" src="https://github.com/user-attachments/assets/df7b186a-00d9-49d1-9322-92e8fe12251e" />oading Ekran görüntüsü 2026-08-14 165618.png…]()
-<img width="1895" height="1069" alt="Ekran görüntüsü 2026-08-14 165702" src="https://github.com/user-attachments/assets/d4082ce0-af99-4f56-84ad-7be030f3200c" />
-<img width="1875" height="1062" alt="Ekran görüntüsü 2026-08-14 165653" src="https://github.com/user-attachments/assets/d0b9bfa5-317a-4c3a-b369-912ae039069a" />
-<img width="1906" height="1064" alt="Ekran görüntüsü 2026-08-14 165640" src="https://github.com/user-attachments/assets/6604a685-7697-484d-9480-eb0e4316badd" />
+- Practice exam tracking by exam type and course
+- Automatic net-score calculation with configurable incorrect-answer penalties
+- Performance analytics, moving averages, trend analysis, and course-level review
+- Target tracking and official exam countdowns
+- Pomodoro timer, stopwatch, study notes, and task planning
+- CSV and Excel export for exam history and reports
+- Light and dark themes with a responsive interface for mobile, tablet, and desktop
+- JWT-based authentication and separate data for each user
 
-### Project Architecture
-```text
-PusulamNet/
-├── app/
-│   ├── main.py               # FastAPI Main Entrypoint & Router Ingestion
-│   ├── config.py             # Application Settings & Statistical Thresholds
-│   ├── database.py           # SQLAlchemy Database Engine & Session Setup
-│   ├── models.py             # SQLAlchemy Database ORM Models
-│   ├── schemas.py            # Pydantic Request & Response Schemas
-│   ├── services/
-│   │   ├── auth_service.py      # Authentication & JWT Token Management
-│   │   ├── net_calculator.py    # Net Score Calculation & Validation
-│   │   ├── analysis_service.py  # Statistical & Moving Average Analytics
-│   │   ├── explanation_service.py # Rule-Based Text Analysis Engine
-│   │   ├── export_service.py    # CSV & Excel Export Generator
-│   │   └── demo_data_service.py # Predefined Exam & Demo Seeding Service
-│   ├── api/
-│   │   ├── auth.py            # Authentication Endpoints
-│   │   ├── dashboard.py       # Dashboard Analytics API
-│   │   ├── exams.py           # Practice Exam CRUD & Export API
-│   │   ├── exam_types.py      # Exam Types & Course Settings API
-│   │   ├── course_analysis.py # Subject Analysis API
-│   │   ├── goals.py           # Target Goal Tracking API
-│   │   ├── report.py          # General Report API
-│   │   ├── planner.py         # Study Notes & Tasks API
-│   │   └── demo.py            # Demo Data Reset API
-│   └── tests/
-│       ├── test_auth_service.py
-│       ├── test_net_calculator.py
-│       ├── test_analysis_service.py
-│       └── test_explanation_service.py
-├── static/
-│   ├── screenshots/          # Application UI Screenshots
-│   ├── index.html            # Main SPA HTML Dashboard Layout
-│   ├── css/
-│   │   └── styles.css        # Custom Modern CSS & Theme Variables
-│   └── js/
-│       ├── app.js            # SPA Controller & Timer Management
-│       ├── api.js            # Central Backend API Client
-│       └── charts.js         # Chart.js Rendering Engine
-├── requirements.txt          # Python Dependencies List
-├── .env.example              # Environment Configuration Template
-├── .gitignore                # Git Excluded Files Rules
-└── README.md                 # Project Documentation
-```
+### Supported Exams
 
-### Tech Stack
-- Backend: Python 3.12, FastAPI, SQLAlchemy ORM, SQLite / PostgreSQL, Pydantic, Passlib (Bcrypt), PyJWT, Pytest
-- Frontend: Single Page Application (SPA), HTML5, Vanilla CSS3 (Custom Dark Glassmorphism System), Vanilla JavaScript (ES6+ OOP), Chart.js, Lucide Icons
+- YKS TYT
+- YKS AYT
+- LGS
+- KPSS
+- TUS
+- DUS
 
-### Quick Start & Setup
-1. Create and activate virtual environment:
+### Architecture
+
+| Area | Responsibility |
+| --- | --- |
+| FastAPI application | Serves the web application and REST API |
+| SQLAlchemy models | Defines users, exams, courses, goals, notes, and tasks |
+| Service layer | Handles authentication, net calculations, analytics, exports, and seed data |
+| Vanilla JavaScript SPA | Provides the client-side interface and API communication |
+| PostgreSQL or SQLite | Stores application data |
+| Service worker | Enables installable PWA behavior and offline shell caching |
+
+### Technology
+
+- Python 3.11
+- FastAPI and Uvicorn
+- SQLAlchemy and Pydantic
+- PostgreSQL with Psycopg or SQLite for local development
+- Vanilla JavaScript, HTML, CSS, and Chart.js
+- PyJWT and Bcrypt
+- Pytest, Pandas, and OpenPyXL
+- Docker, Render, and Supabase PostgreSQL
+
+### Local Setup
+
+1. Create and activate a virtual environment.
+
    ```bash
    python -m venv venv
-   # Windows:
+   ```
+
+   Windows:
+
+   ```bash
    venv\Scripts\activate
-   # Linux/macOS:
+   ```
+
+   Linux or macOS:
+
+   ```bash
    source venv/bin/activate
    ```
-2. Install dependencies:
+
+2. Install dependencies.
+
    ```bash
    pip install -r requirements.txt
    ```
-3. Start the application:
+
+3. Start the development server.
+
    ```bash
    python -m uvicorn app.main:app --reload
    ```
-4. Access web application at `http://127.0.0.1:8000` and API docs at `http://127.0.0.1:8000/docs`.
 
-### Running Tests
-Execute unit tests via Pytest:
-```bash
-pytest
-```
+4. Open http://127.0.0.1:8000 in a browser. API documentation is available at http://127.0.0.1:8000/docs.
 
-### Database & Configuration
-The default database is SQLite (`pusulamnet.db`). To configure PostgreSQL or change environment settings, update `.env`:
+### Configuration
+
+Copy `.env.example` to `.env` and set a strong secret key before production use.
+
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/pusulamnet
-SECRET_KEY=your_production_secret_key_here
+DATABASE_URL=sqlite:///./pusulamnet.db
+SECRET_KEY=replace-with-a-long-random-value
 ```
 
-### Security & Deployment
-- Never commit `.env` or `pusulamnet.db` files. Exclusions are defined in `.gitignore`.
-- Use a strong `SECRET_KEY` in production.
-- Enable HTTPS SSL certificates for production server deployments.
+For PostgreSQL, use the connection URL supplied by your provider. Do not commit `.env`, database files, or connection URLs to source control.
 
-### License
-This project is licensed under the MIT License.
+### Tests
 
----
+Run the test suite with:
 
-## Türkçe Bölüm
+```bash
+pytest app/tests
+```
+
+### Deployment and Security
+
+The production deployment uses Render for the web service and Supabase PostgreSQL for persistent data. Configure `DATABASE_URL` and `SECRET_KEY` only in the Render Environment settings.
+
+The source repository excludes `.env`, SQLite database files, virtual environments, and key files. Passwords are stored as Bcrypt hashes, and user-specific API endpoints require a valid JWT.
+
+## Türkçe
 
 ### Genel Bakış
-PusulamNet, öğrencilerin çözdükleri deneme sınavlarının sonuçlarını (doğru, yanlış, boş) ders bazında kaydederek netlerini otomatik hesaplamasını, gelişim süreçlerini istatistiksel grafiklerle takip etmesini, geri sayım sayacı ve zamanlayıcı araçlarıyla çalışma oturumlarını yönetmesini sağlayan tam kapsamlı bir web uygulamasıdır.
 
-### Öne Çıkan Özellikler
-- Otomatik Net Hesaplama: Sınav türüne özel yanlış-doğru götürme katsayıları (Örn: 4 yanlış 1 doğru, 3 yanlış 1 doğru).
-- İstatistiksel Performans Analizi: Ortalama net, hareketli ortalamalar, standart sapma ile performans istikrarı sınıflandırması (İstikrarlı, Orta Dalgalı, Dalgalı) ve eğilim analizi.
-- Kural Tabanlı Otomatik Değerlendirme Motoru: İstatistiksel eşik değerlerine dayalı yapıcı ve nesnel Türkçe analiz motoru.
-- Sınav & Çalışma Zamanlayıcısı: Gerçek Sınav Modu (Deneme süresi bitince süre aktarımı), Pomodoro Odaklanma Modu ve Tur/Ders Sayacı.
-- Ders Notları Defteri & Çalışma Planlayıcısı: Ders bazlı kategorize edilebilir not defteri ve öncelik seviyeli yapılacaklar listesi.
-- Resmi Sınav Geri Sayımı: ÖSYM ve MEB resmi sınav tarihlerine göre dinamik kalan zaman sayacı.
-- Veri Dışa Aktarma: Deneme geçmişi ve genel performans raporlarının CSV ve Excel (.xlsx) formatında indirilmesi.
-- Tam Responsive Arayüz: Koyu/Açık Tema desteği, cam efektli (glassmorphism) modern arayüz ve özel diyalog modalları.
+PusulamNet, Türkiye'deki ulusal sınavlara hazırlanan öğrencilerin deneme sonuçlarını kaydetmesini, netlerini otomatik hesaplamasını, gelişimini grafiklerle takip etmesini ve çalışma düzenini planlamasını sağlayan kişisel bir web uygulamasıdır. Mobil uyumlu yapısı sayesinde telefon ve tablette PWA olarak da kullanılabilir.
 
-### Uygulama Ekran Görüntüleri
+### Özellikler
 
-<img width="1571" height="1007" alt="Ekran görüntüsü 2026-08-14 165618" src="https://github.com/user-attachments/assets/524b205f-ab31-463c-ada2-0951ba73f3f1" /><img width="1894" height="1065" alt="Ekran görüntüsü 2026-08-14 165605" src="https://github.com/user-attachments/assets/9f9653f3-ec87-4eea-8e72-b04fea40e9e0" />
-<img width="351" height="385" alt="Ekran görüntüsü 2026-08-14 165744" src="https://github.com/user-attachments/assets/75a191fa-ad72-4ab0-9cdb-423bf1a4b0e8" />
-<img width="1914" height="1072" alt="Ekran görüntüsü 2026-08-14 165736" src="https://github.com/user-attachments/assets/da3f79eb-32a3-4ece-930e-396cd2c36ce7" />
-<img width="1910" height="1073" alt="Ekran görüntüsü 2026-08-14 165729" src="https://github.com/user-attachments/assets/a45886fd-7030-4a3d-b44f-9fd8f95464b0" />
-<img width="1893" height="1073" alt="Ekran görüntüsü 2026-08-14 165711" src="https://github.com/user-attachments/assets/b260064f-3f26-4892-8034-b5b8738a6294" /><img width="1892" height="1068" alt="Ekran görüntüsü 2026-08-14 165631" src="https://github.com/user-attachments/assets/df7b186a-00d9-49d1-9322-92e8fe12251e" />oading Ekran görüntüsü 2026-08-14 165618.png…]()
-<img width="1895" height="1069" alt="Ekran görüntüsü 2026-08-14 165702" src="https://github.com/user-attachments/assets/d4082ce0-af99-4f56-84ad-7be030f3200c" />
-<img width="1875" height="1062" alt="Ekran görüntüsü 2026-08-14 165653" src="https://github.com/user-attachments/assets/d0b9bfa5-317a-4c3a-b369-912ae039069a" />
-<img width="1906" height="1064" alt="Ekran görüntüsü 2026-08-14 165640" src="https://github.com/user-attachments/assets/6604a685-7697-484d-9480-eb0e4316badd" />
-### Proje Mimarisi
-```text
-PusulamNet/
-├── app/
-│   ├── main.py               # FastAPI Ana Uygulama & Sunucu
-│   ├── config.py             # Ayarlar & Analiz Eşik Değerleri
-│   ├── database.py           # SQLAlchemy Veritabanı Bağlantısı
-│   ├── models.py             # SQLAlchemy ORM Veritabanı Modelleri
-│   ├── schemas.py            # Pydantic Şemaları
-│   ├── services/
-│   │   ├── auth_service.py      # Kimlik Doğrulama & JWT Servisi
-│   │   ├── net_calculator.py    # Net & Form Doğrulama Servisi
-│   │   ├── analysis_service.py  # İstatistik & Hareketli Ortalama Servisi
-│   │   ├── explanation_service.py # Kural Tabanlı Metin Açıklama Motoru
-│   │   ├── export_service.py    # CSV & Excel Dışa Aktarma Servisi
-│   │   └── demo_data_service.py # Örnek Demo Veri Yükleme Servisi
-│   ├── api/
-│   │   ├── auth.py            # Kimlik Doğrulama API
-│   │   ├── dashboard.py       # Ana Panel API
-│   │   ├── exams.py           # Deneme CRUD & Export API
-│   │   ├── exam_types.py      # Sınav Türleri & Ders Ayarları API
-│   │   ├── course_analysis.py # Ders Analizi API
-│   │   ├── goals.py           # Hedef Takip API
-│   │   ├── report.py          # Genel Rapor API
-│   │   ├── planner.py         # Notlar & Planlayıcı API
-│   │   └── demo.py            # Demo Yükleme API
-│   └── tests/
-│       ├── test_auth_service.py
-│       ├── test_net_calculator.py
-│       ├── test_analysis_service.py
-│       └── test_explanation_service.py
-├── static/
-│   ├── screenshots/          # Ekran Görüntüleri Görselleri
-│   ├── index.html            # Modern Web SPA Ana Arayüzü
-│   ├── css/
-│   │   └── styles.css        # Custom CSS & Tema Stilleri
-│   └── js/
-│       ├── app.js            # SPA Controller & Zamanlayıcı Motoru
-│       ├── api.js            # Backend API İletişim Modülü
-│       └── charts.js         # Chart.js Görselleştirme Modülü
-├── requirements.txt          # Python Bağımlılık Listesi
-├── .env.example              # Ortam Değişkenleri Şablonu
-├── .gitignore                # Git Engelleme Kuralları
-└── README.md                 # Proje Dokümantasyonu
-```
+- Sınav türü ve ders bazında deneme kaydı
+- Yanlış cevap götürme oranına göre otomatik net hesaplama
+- Hareketli ortalama, eğilim ve ders bazlı performans analizi
+- Hedef takibi ve resmî sınav geri sayımları
+- Pomodoro, kronometre, ders notları ve görev planlayıcısı
+- Deneme geçmişi ve raporları CSV ile Excel olarak dışa aktarma
+- Telefon, tablet ve masaüstüne uyumlu açık ve koyu tema
+- JWT tabanlı oturum sistemi ve her kullanıcı için ayrı veriler
 
-### Teknoloji Yığını
-- Arka Plan (Backend): Python 3.12, FastAPI, SQLAlchemy ORM, SQLite / PostgreSQL, Pydantic, Passlib (Bcrypt), PyJWT, Pytest
-- Ön Yüz (Frontend): Tek Sayfa Uygulaması (SPA), HTML5, Vanilla CSS3 (Koyu Cam Efektli Tasarım), Vanilla JavaScript (ES6+ OOP), Chart.js, Lucide İkonları
+### Desteklenen Sınavlar
 
-### Hızlı Başlangıç & Kurulum
-1. Sanal ortamı (venv) oluşturun ve aktif edin:
+- YKS TYT
+- YKS AYT
+- LGS
+- KPSS
+- TUS
+- DUS
+
+### Mimari
+
+| Katman | Sorumluluk |
+| --- | --- |
+| FastAPI uygulaması | Web arayüzünü ve REST API'yi sunar |
+| SQLAlchemy modelleri | Kullanıcı, deneme, ders, hedef, not ve görev verilerini tanımlar |
+| Servis katmanı | Kimlik doğrulama, net hesaplama, analiz, dışa aktarma ve örnek verileri yönetir |
+| Vanilla JavaScript SPA | Arayüzü ve API iletişimini yönetir |
+| PostgreSQL veya SQLite | Uygulama verilerini saklar |
+| Service worker | Uygulamanın PWA olarak kurulmasını ve temel çevrimdışı önbelleği sağlar |
+
+### Teknolojiler
+
+- Python 3.11
+- FastAPI ve Uvicorn
+- SQLAlchemy ve Pydantic
+- Psycopg ile PostgreSQL veya yerel geliştirme için SQLite
+- Vanilla JavaScript, HTML, CSS ve Chart.js
+- PyJWT ve Bcrypt
+- Pytest, Pandas ve OpenPyXL
+- Docker, Render ve Supabase PostgreSQL
+
+### Yerelde Çalıştırma
+
+1. Sanal ortam oluşturun ve etkinleştirin.
+
    ```bash
    python -m venv venv
-   # Windows:
+   ```
+
+   Windows:
+
+   ```bash
    venv\Scripts\activate
-   # Linux/macOS:
+   ```
+
+   Linux veya macOS:
+
+   ```bash
    source venv/bin/activate
    ```
-2. Bağımlılıkları yükleyin:
+
+2. Bağımlılıkları yükleyin.
+
    ```bash
    pip install -r requirements.txt
    ```
-3. Uygulamayı başlatın:
+
+3. Geliştirme sunucusunu başlatın.
+
    ```bash
    python -m uvicorn app.main:app --reload
    ```
-4. Uygulamaya `http://127.0.0.1:8000` adresinden, Swagger API dokümantasyonuna `http://127.0.0.1:8000/docs` adresinden erişebilirsiniz.
 
-### Testleri Çalıştırma
-Birim testlerini yürütmek için:
-```bash
-pytest
-```
+4. Tarayıcıdan http://127.0.0.1:8000 adresini açın. API dokümantasyonuna http://127.0.0.1:8000/docs adresinden erişebilirsiniz.
 
-### Veritabanı ve Yapılandırma
-Uygulama varsayılan olarak `pusulamnet.db` adında SQLite veritabanı kullanır. PostgreSQL veritabanına geçmek için `.env` dosyasını güncelleyin:
+### Yapılandırma
+
+`.env.example` dosyasını `.env` olarak kopyalayın ve canlıya almadan önce güçlü bir gizli anahtar tanımlayın.
+
 ```env
-DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/pusulamnet
-SECRET_KEY=goclu_ve_gizli_jwt_anahtari
+DATABASE_URL=sqlite:///./pusulamnet.db
+SECRET_KEY=uzun-ve-rastgele-bir-deger-yazin
 ```
 
-### Güvenlik ve Canlıya Alma
-- Üretim ortamında `.env` dosyasında güçlü bir `SECRET_KEY` tanımlayın.
-- `.env` ve `pusulamnet.db` dosyalarını asla GitHub'a commit etmeyin. `.gitignore` yapılandırması hazır durumdadır.
-- Canlı sunucu kurulumlarında HTTPS SSL sertifikası kullanın.
+PostgreSQL için sağlayıcınızın verdiği bağlantı adresini kullanın. `.env`, veritabanı dosyaları ve bağlantı adreslerini hiçbir zaman GitHub'a yüklemeyin.
 
-### Lisans
-Bu proje MIT lisansı ile korunmaktadır.
+### Testler
+
+Testleri çalıştırmak için:
+
+```bash
+pytest app/tests
+```
+
+### Yayınlama ve Güvenlik
+
+Canlı sürüm web servisi için Render, kalıcı veri için Supabase PostgreSQL kullanır. `DATABASE_URL` ve `SECRET_KEY` değerlerini yalnızca Render Environment ayarlarında saklayın.
+
+Kaynak depoda `.env`, SQLite veritabanı dosyaları, sanal ortamlar ve anahtar dosyaları dışarıda bırakılır. Kullanıcı parolaları Bcrypt ile özetlenir; kullanıcıya özel API uçları geçerli bir JWT gerektirir.
