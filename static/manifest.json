@@ -1,0 +1,18 @@
+{
+  "name": "PusulamNet - Deneme Takip & Analiz",
+  "short_name": "PusulamNet",
+  "description": "Öğrenci Deneme Takip ve İstatistiksel Analiz Sistemi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "64x64 128x128 256x256 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

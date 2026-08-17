@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PusulamNet - Öğrenci Deneme Takip ve Analiz Sistemi</title>
+    <!-- Favicon / Tab Logosu -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PusulamNet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css?v=4.0.0">
+
+
+    <!-- Chart.js & Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Mobil Üst Çubuk (Sadece Mobilde Görünür) -->
+    <header class="mobile-topbar" id="mobileTopbar">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnMobileMenuToggle" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.4rem 0.85rem;">
+            Menü
+        </button>
+        <span class="mobile-brand-title" onclick="App.navigateTo('dashboard')" style="cursor:pointer; font-weight:800; font-size:1.15rem; color:var(--text-primary);">PusulamNet</span>
+        <div style="width:45px;"></div>
+    </header>
+
+    <!-- Mobil Menü Karartma Katmanı -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="App.closeSidebar()"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header-box" style="display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:space-between; gap:0.5rem; width:100%; margin-bottom:1.25rem;">
+            <div class="brand" id="brandLogo" style="cursor:pointer; margin:0; padding:0; flex:1; min-width:0; display:flex; align-items:center;" onclick="App.navigateTo('dashboard')">
+                <span class="brand-title" style="font-size:1.2rem; font-weight:800; color:var(--text-primary); white-space:nowrap;">PusulamNet</span>
+            </div>
+            <button type="button" class="btn-sidebar-toggle desktop-sidebar-toggle" title="Menüyü Kapat / Gizle" onclick="App.toggleSidebar()">
+                <i data-lucide="panel-left-close"></i>
+            </button>
+        </div>
+
+        <ul class="nav-list">
+
+            <li>
+                <a class="nav-item active" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span class="nav-text">Ana Panel</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="add_exam">
+                    <i data-lucide="file-plus-2"></i>
+                    <span class="nav-text">Yeni Deneme Ekle</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="exam_history">
+                    <i data-lucide="history"></i>
+                    <span class="nav-text">Deneme Geçmişi</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="course_analysis">
+                    <i data-lucide="line-chart"></i>
+                    <span class="nav-text">Ders Analizi</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="goals">
+                    <i data-lucide="target"></i>
+                    <span class="nav-text">Hedef Takibi</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="report">
+                    <i data-lucide="file-spreadsheet"></i>
+                    <span class="nav-text">Genel Rapor</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="timer">
+                    <i data-lucide="clock"></i>
+                    <span class="nav-text">Sınav Zamanlayıcısı</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="planner">
+                    <i data-lucide="book-open"></i>
+                    <span class="nav-text">Notlar & Planlama</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item" data-page="settings">
+                    <i data-lucide="settings"></i>
+                    <span class="nav-text">Sınav Ayarları</span>
+                </a>
+            </li>
+
+        </ul>
+
+
+        <div class="sidebar-footer">
+            <div id="userProfileCard" style="margin-bottom:0.75rem; padding:0.6rem; background:var(--bg-card); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:space-between; gap:0.5rem; border:1px solid var(--border-color);">
+
+                <div style="display:flex; align-items:center; gap:0.5rem; overflow:hidden;">
+                    <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-blue); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; flex-shrink:0;">
+                        <i data-lucide="user" style="width:16px; height:16px;"></i>
+                    </div>
+                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <div id="userNameDisplay" style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">Öğrenci</div>
+                        <div id="userEmailDisplay" style="font-size:0.7rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis;">ogrenci@pusulam.net</div>
+                    </div>
+                </div>
+                <button id="btnLogout" class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem;" title="Çıkış Yap">
+                    <i data-lucide="log-out" style="width:14px; height:14px;"></i>
+                </button>
+            </div>
+
+            <button class="theme-toggle-btn" id="themeToggleBtn">
+                <i data-lucide="moon" id="themeIcon" style="width:16px; height:16px;"></i>
+                <span id="themeLabel">Koyu Tema</span>
+            </button>
+
+
+        </div>
+    </aside>
+
+    <!-- Main Content View -->
+    <main class="main-content">
+
+        <!-- 1. ANA PANEL (DASHBOARD) PAGE -->
+        <section id="page-dashboard" class="page-view">
+
+            <div class="header-bar">
+
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Ana Panel</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Genel performans özeti, grafikler ve otomatik analizler</p>
+                    </div>
+                </div>
+                <div class="header-controls" id="dashboardHeaderControls" style="display:flex; align-items:center; gap:0.85rem; flex-wrap:wrap;">
+                    <!-- Global Active Exam Selector in Header -->
+                    <div class="header-exam-selector-box" style="min-width:200px;">
+                        <label style="font-size:0.68rem; color:var(--text-muted); display:block; margin-bottom:0.25rem; font-weight:700; letter-spacing:0.5px;">AKTİF SINAVIM</label>
+                        <select id="globalHeaderExamTypeSelect" class="select-input" style="width:100%; font-weight:700; font-size:0.9rem; padding:0.55rem 0.85rem; background:var(--bg-card); border-color:var(--accent-blue);"></select>
+                    </div>
+
+                    <!-- Exam Countdown Card -->
+                    <div id="examCountdownCard" style="display:flex; align-items:center; gap:0.75rem; padding:0.6rem 1.1rem; background:linear-gradient(135deg, rgba(59,130,246,0.12), rgba(99,102,241,0.12)); border:1px solid rgba(59,130,246,0.3); border-radius:var(--radius-md); box-shadow:0 4px 14px rgba(59,130,246,0.15);">
+                        <div style="width:40px; height:40px; border-radius:50%; background:var(--accent-blue); display:flex; align-items:center; justify-content:center; color:white; flex-shrink:0;">
+                            <i data-lucide="timer" style="width:20px; height:20px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.68rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Sınava Kalan Süre</div>
+                            <div style="font-size:1.1rem; font-weight:800; color:var(--accent-blue);" id="examCountdownText">--</div>
+                            <div style="font-size:0.72rem; color:var(--text-secondary);" id="examDateText">Sınav Tarihi: --</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Summary Metric Cards -->
+            <div class="card-grid" id="dashMetricCards"></div>
+
+            <!-- Auto Explanations Box -->
+            <div class="explanation-box" id="dashExplanationBox">
+                <div class="explanation-title">
+                    <i data-lucide="sparkles"></i> Otomatik Performans Analizi (Kural Tabanlı)
+                </div>
+                <ul class="explanation-list" id="dashExplanationList"></ul>
+            </div>
+
+            <!-- Dashboard Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <span><i data-lucide="trending-up"></i> Toplam Net Gelişim Trendi</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartTrend"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <span><i data-lucide="bar-chart-2"></i> Son Denemedeki Ders Netleri</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartLatestCourses"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <span><i data-lucide="pie-chart"></i> Doğru / Yanlış / Boş Dağılımı</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartAnswersBreakdown"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <span><i data-lucide="target"></i> Son 5 Deneme Ortalaması vs Hedef</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartTargetVsLast5"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 2. YENİ DENEME EKLE PAGE -->
+        <section id="page-add_exam" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Yeni Deneme Ekle</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Çözdüğünüz deneme sınavının ders bazlı sonuçlarını girin</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <form id="addExamForm">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Sınav Türü *</label>
+                            <select id="formExamTypeSelect" class="select-input" style="width:100%;" required></select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Deneme Adı *</label>
+                            <input type="text" id="formExamName" class="text-input" style="width:100%;" placeholder="Örn: Özdebir TYT Pro-1" required>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Tarih *</label>
+                            <input type="date" id="formExamDate" class="date-input" style="width:100%;" required>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Yayınevi (İsteğe Bağlı)</label>
+                            <input type="text" id="formPublisher" class="text-input" style="width:100%;" placeholder="Örn: 3D Yayınları">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Süre (Dakika)</label>
+                            <input type="number" id="formDuration" class="text-input" style="width:100%;" placeholder="Örn: 165" min="0">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Zorluk Seviyesi</label>
+                            <select id="formDifficulty" class="select-input" style="width:100%;">
+                                <option value="Orta">Orta</option>
+                                <option value="Kolay">Kolay</option>
+                                <option value="Zor">Zor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Ders Sonuçları</h3>
+                    
+                    <div id="courseInputsContainer">
+                        <!-- Dynamic Course Inputs Rendered Here -->
+                    </div>
+
+                    <!-- Live Total Preview Box -->
+                    <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: var(--radius-md); margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span style="font-size: 0.9rem; color: var(--text-secondary);">Anlık Hesaplanan Toplam Net:</span>
+                            <span id="liveTotalNet" style="font-family:'Outfit'; font-size: 1.8rem; font-weight:700; color:var(--accent-blue); margin-left:0.5rem;">0.00</span>
+                        </div>
+                        <div style="display:flex; gap:1rem; font-size:0.9rem; color:var(--text-secondary);">
+                            <span>Doğru: <b id="liveTotalCorrect" style="color:var(--success-text)">0</b></span>
+                            <span>Yanlış: <b id="liveTotalWrong" style="color:var(--danger-text)">0</b></span>
+                            <span>Boş: <b id="liveTotalBlank" style="color:var(--text-muted)">0</b></span>
+                        </div>
+                        <button type="button" id="btnPreviewExam" class="btn btn-primary">
+                            <i data-lucide="check-circle-2"></i> Önizle & Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- 3. DENEME GEÇMİŞİ PAGE -->
+        <section id="page-exam_history" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Deneme Geçmişi</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Kaydedilen tüm deneme sınavları, detaylar ve dışa aktarma</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <a id="btnExportCSV" href="#" class="btn btn-secondary" title="CSV İndir"><i data-lucide="file-text"></i> CSV İndir</a>
+                    <a id="btnExportExcel" href="#" class="btn btn-success" title="Excel İndir"><i data-lucide="file-spreadsheet"></i> Excel İndir</a>
+                </div>
+
+            </div>
+
+            <div class="table-card">
+                <table class="custom-table" id="examsHistoryTable">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Deneme Adı</th>
+                            <th>Sınav Türü</th>
+                            <th>Doğru</th>
+                            <th>Yanlış</th>
+                            <th>Boş</th>
+                            <th>Toplam Net</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- 4. DERS ANALİZİ PAGE -->
+        <section id="page-course_analysis" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Ders Analizi</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Tek bir derse odaklanarak net trendini ve ortalamaları inceleyin</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <select id="analysisCourseSelect" class="select-input" style="min-width: 200px;"></select>
+                </div>
+            </div>
+
+            <div class="card-grid" id="courseMetricCards"></div>
+
+            <div class="explanation-box" id="courseExplanationBox">
+                <div class="explanation-title"><i data-lucide="sparkles"></i> Ders Özel Analiz Açıklamaları</div>
+                <ul class="explanation-list" id="courseExplanationList"></ul>
+            </div>
+
+            <div class="charts-grid" style="grid-template-columns: 1fr;">
+                <div class="chart-card">
+                    <div class="chart-title"><span><i data-lucide="trending-up"></i> Seçilen Dersin Net Gelişim Çizgi Grafiği</span></div>
+                    <div class="chart-container">
+                        <canvas id="chartCourseTrend"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Son Denemeler Karşılaştırma Tablosu</h3>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Deneme Adı</th>
+                            <th>Doğru</th>
+                            <th>Yanlış</th>
+                            <th>Boş</th>
+                            <th>Ders Neti</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseComparisonTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- 5. HEDEF TAKİBİ PAGE -->
+        <section id="page-goals" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Hedef Takibi</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Genel hedef netiniz ve ders bazlı hedeflere olan mesafeniz</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-grid" id="goalsMetricCards"></div>
+
+            <div class="explanation-box" id="goalsExplanationBox">
+                <div class="explanation-title"><i data-lucide="compass"></i> Hedef Durum Değerlendirmesi</div>
+                <ul class="explanation-list" id="goalsExplanationList"></ul>
+            </div>
+
+            <div class="table-card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Ders Bazlı Hedef Karşılaştırması</h3>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Ders Adı</th>
+                            <th>Soru Sayısı</th>
+                            <th>Hedef Net</th>
+                            <th>Mevcut Ortalama</th>
+                            <th>Hedefe Kalan Fark</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseGoalsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- 6. GENEL RAPOR PAGE -->
+        <section id="page-report" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Genel Rapor</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Aktif sınav türüne ait detaylı performans raporu ve indirme seçenekleri</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <a id="btnReportCSV" href="#" class="btn btn-secondary"><i data-lucide="file-text"></i> CSV İndir</a>
+                    <a id="btnReportExcel" href="#" class="btn btn-success"><i data-lucide="file-spreadsheet"></i> Excel İndir</a>
+                </div>
+            </div>
+
+
+            <div class="card-grid" id="reportMetricCards"></div>
+
+            <div class="explanation-box" id="reportExplanationBox">
+                <div class="explanation-title"><i data-lucide="file-text"></i> Otomatik Dönem Analizi Özeti</div>
+                <ul class="explanation-list" id="reportExplanationList"></ul>
+            </div>
+
+            <div class="table-card">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Ders Bazlı Performans Özet Tablosu</h3>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Ders Adı</th>
+                            <th>Ortalama Net</th>
+                            <th>Ort. Doğru</th>
+                            <th>Ort. Yanlış</th>
+                            <th>Ort. Boş</th>
+                            <th>Dönemsel Değişim</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportCourseTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- 6.5. SINAV & ÇALIŞMA ZAMANLAYICISI PAGE -->
+        <section id="page-timer" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Sınav & Çalışma Zamanlayıcısı</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Gerçek deneme sınavı süresi, Pomodoro odaklanma ve serbest kronometre</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zamanlayıcı Modu Seçici Üst Barı -->
+            <div class="table-card" style="margin-bottom: 1.25rem; padding: 1.1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">
+                        Zamanlayıcı Modu:
+                    </label>
+                    <select id="timerMainModeSelect" class="select-input" style="flex: 1; max-width: 360px; font-weight: 700;">
+                        <option value="exam" selected>Gerçek Sınav Modu (Deneme Sayacı)</option>
+                        <option value="pomodoro">Pomodoro Odaklanma Modu</option>
+                        <option value="stopwatch">Serbest Kronometre & Tur Sayacı</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Mode 1: Gerçek Sınav Modu -->
+            <div id="timerModeExam" class="timer-mode-content">
+                <div class="table-card timer-main-card">
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.75rem;" id="timerExamTitle">
+                        YKS - TYT (165 Dk)
+                    </div>
+                    
+                    <!-- Exam Duration Dropdown (Kompakt Seçici) -->
+                    <div style="display:flex; justify-content:center; align-items:center; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+                        <label style="font-size:0.82rem; font-weight:700; color:var(--text-secondary); white-space:nowrap;">
+                            Sınav / Süre Seçin:
+                        </label>
+                        <select id="timerExamPresetSelect" class="select-input" style="max-width:280px; width:100%; font-weight:700;">
+                            <option value="165" selected>YKS - TYT (165 Dk)</option>
+                            <option value="180">YKS - AYT (180 Dk)</option>
+                            <option value="150">DUS (150 Dk)</option>
+                            <option value="135">TUS (135 Dk)</option>
+                            <option value="130">KPSS (130 Dk)</option>
+                            <option value="75">LGS (75 Dk)</option>
+                            <option value="60">60 Dakika</option>
+                            <option value="45">45 Dakika</option>
+                            <option value="30">30 Dakika</option>
+                        </select>
+                    </div>
+
+                    <!-- Digital Clock Display (Kompakt & Net) -->
+                    <div class="timer-clock-display" id="examClockDisplay">
+                        02:45:00
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div style="width:100%; height:6px; background:var(--bg-secondary); border-radius:3px; overflow:hidden; margin-bottom:1.5rem; border:1px solid var(--border-color);">
+                        <div id="examProgressBar" style="width:100%; height:100%; background:linear-gradient(90deg, var(--accent-blue), #6366f1); transition:width 0.3s linear;"></div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="timer-controls-box">
+                        <button type="button" id="btnExamStart" class="btn btn-success btn-timer-main">
+                            <i data-lucide="play"></i> Başlat
+                        </button>
+                        <button type="button" id="btnExamPause" class="btn btn-secondary btn-timer-main" style="display:none;">
+                            <i data-lucide="pause"></i> Duraklat
+                        </button>
+                        <button type="button" id="btnExamReset" class="btn btn-danger btn-timer-sub">
+                            <i data-lucide="rotate-ccw"></i> Sıfırla
+                        </button>
+                        <button type="button" id="btnExamFinish" class="btn btn-primary btn-timer-finish">
+                            <i data-lucide="check-square"></i> Denemeyi Bitir & Kaydet
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode 2: Pomodoro Odaklanma Modu -->
+            <div id="timerModePomodoro" class="timer-mode-content" style="display:none;">
+                <div class="table-card timer-main-card">
+                    <div style="font-size:0.85rem; font-weight:700; color:var(--accent-emerald); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.75rem;" id="pomodoroPhaseTitle">
+                        Odaklanma Süresi (Çalışma)
+                    </div>
+
+                    <!-- Pomodoro Preset Dropdown -->
+                    <div style="display:flex; justify-content:center; align-items:center; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap;">
+                        <label style="font-size:0.82rem; font-weight:700; color:var(--text-secondary); white-space:nowrap;">
+                            Çalışma Seansı:
+                        </label>
+                        <select id="timerPomoPresetSelect" class="select-input" style="max-width:280px; width:100%; font-weight:700;">
+                            <option value="25-5" selected>25 Dk Çalışma / 5 Dk Mola</option>
+                            <option value="45-10">45 Dk Çalışma / 10 Dk Mola</option>
+                            <option value="50-10">50 Dk Çalışma / 10 Dk Mola</option>
+                            <option value="60-15">60 Dk Çalışma / 15 Dk Mola</option>
+                        </select>
+                    </div>
+
+                    <!-- Digital Clock Display -->
+                    <div class="timer-clock-display" id="pomoClockDisplay" style="color:var(--text-primary); text-shadow:0 0 20px rgba(16,185,129,0.25);">
+                        25:00
+                    </div>
+
+                    <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1.25rem;" id="pomoCountDisplay">
+                        Bugün Tamamlanan Pomodoro: <strong>0 Session</strong>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="timer-controls-box">
+                        <button type="button" id="btnPomoStart" class="btn btn-success btn-timer-main">
+                            <i data-lucide="play"></i> Başlat
+                        </button>
+                        <button type="button" id="btnPomoPause" class="btn btn-secondary btn-timer-main" style="display:none;">
+                            <i data-lucide="pause"></i> Duraklat
+                        </button>
+                        <button type="button" id="btnPomoReset" class="btn btn-danger btn-timer-sub">
+                            <i data-lucide="rotate-ccw"></i> Sıfırla
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode 3: Serbest Kronometre & Tur Sayacı -->
+            <div id="timerModeStopwatch" class="timer-mode-content" style="display:none;">
+                <div class="stopwatch-grid-layout" style="display:grid; grid-template-columns: 1fr; gap:1.25rem;">
+                    <div class="table-card timer-main-card">
+                        <div style="font-size:0.85rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">
+                            Serbest Geçen Süre
+                        </div>
+
+                        <!-- Digital Clock Display -->
+                        <div class="timer-clock-display" id="swClockDisplay" style="color:var(--text-primary); text-shadow:0 0 20px rgba(99,102,241,0.25);">
+                            00:00:00
+                        </div>
+
+                        <!-- Control Buttons -->
+                        <div class="timer-controls-box">
+                            <button type="button" id="btnSwStart" class="btn btn-success btn-timer-main">
+                                <i data-lucide="play"></i> Başlat
+                            </button>
+                            <button type="button" id="btnSwPause" class="btn btn-secondary btn-timer-main" style="display:none;">
+                                <i data-lucide="pause"></i> Duraklat
+                            </button>
+                            <button type="button" id="btnSwLap" class="btn btn-primary btn-timer-sub">
+                                Tur Ekle
+                            </button>
+                            <button type="button" id="btnSwReset" class="btn btn-danger btn-timer-sub">
+                                <i data-lucide="rotate-ccw"></i> Sıfırla
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lap List Card -->
+                    <div class="table-card">
+                        <h3 style="font-size:1rem; margin-bottom:0.75rem;">Tur / Ders Geçmişi</h3>
+                        <ul id="swLapList" style="list-style:none; display:flex; flex-direction:column; gap:0.5rem; max-height:280px; overflow-y:auto;">
+                            <li style="padding:0.75rem; text-align:center; color:var(--text-muted); font-size:0.85rem;">Henüz tur kaydedilmedi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 6.8. NOTLAR & PLANLAMA PAGE -->
+        <section id="page-planner" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Notlar & Çalışma Planı</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Derslerinize özel notlar tutun, formül & püf noktalarını derleyin, haftalık yapılacaklar listenizi yönetin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planner Main Navigation Dropdown (Sade & Sembolsüz) -->
+            <div class="table-card" style="margin-bottom: 1.25rem; padding: 1.1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">
+                        Bölüm:
+                    </label>
+                    <select id="plannerMainTabSelect" class="select-input" style="flex: 1; max-width: 360px; font-weight: 700;">
+                        <option value="notes" selected>Ders Notları Defteri</option>
+                        <option value="tasks">Çalışma Planı & Görevler</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tab 1: Ders Notları -->
+            <div id="plannerTabNotes" class="planner-tab-content">
+                <div class="card planner-notes-filter-card" style="margin-bottom: 1.25rem; padding: 1.1rem;">
+                    <div class="planner-notes-filter-container" style="display:flex; flex-direction:column; gap:0.75rem;">
+                        <div class="planner-notes-filter-selects" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <select id="noteFilterCourseSelect" class="form-control" style="flex:1;">
+                                <option value="">Tüm Dersler</option>
+                            </select>
+                            <select id="noteFilterTypeSelect" class="form-control" style="flex:1;">
+                                <option value="">Tüm Not Türleri</option>
+                                <option value="general">Ders Notu</option>
+                                <option value="formula">Formül & Püf Noktası</option>
+                                <option value="mistake">Yanlış Sorular / Eksikler</option>
+                                <option value="reminder">Önemli Hatırlatma</option>
+                            </select>
+                        </div>
+                        <button type="button" id="btnOpenCreateNoteModal" class="btn btn-primary btn-create-note" style="width:100%;">
+                            Yeni Not Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notes Grid Container -->
+                <div id="notesGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;">
+                    <div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
+                        Yükleniyor...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Çalışma Planı & Görevler -->
+            <div id="plannerTabTasks" class="planner-tab-content" style="display:none;">
+                <div class="card" style="margin-bottom: 1.25rem; padding: 1.1rem;">
+                    <h3 style="font-size:1rem; margin-bottom:0.75rem;">Yeni Çalışma Görevi Ekle</h3>
+                    <form id="createTaskForm" class="planner-task-form" style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <div>
+                            <label class="form-label" style="font-size:0.75rem;">Görev / Hedef Açıklaması</label>
+                            <input type="text" id="taskTitleInput" class="form-control" placeholder="Örn: TYT Matematik 30 Soru Çöz" required>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size:0.75rem;">İlgili Ders</label>
+                            <select id="taskCourseSelect" class="form-control">
+                                <option value="">Genel / Ders Yok</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size:0.75rem;">Öncelik</label>
+                            <select id="taskPrioritySelect" class="form-control">
+                                <option value="medium">Orta Öncelik</option>
+                                <option value="high">Yüksek Öncelik</option>
+                                <option value="low">Düşük Öncelik</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-size:0.75rem;">Hedef Tarih</label>
+                            <input type="date" id="taskDueDateInput" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width:100%;">
+                            Görev Ekle
+                        </button>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 0.75rem;">Yapılacak Çalışma Görevleri</h3>
+                    <ul id="taskListContainer" style="list-style:none; display:flex; flex-direction:column; gap:0.5rem;">
+                        <li style="text-align:center; padding:2rem; color:var(--text-muted);">Görevler yükleniyor...</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7. SINAV AYARLARI PAGE -->
+        <section id="page-settings" class="page-view" style="display: none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">Menü</button>
+                    <div>
+                        <h1 class="page-title">Sınav Ayarları</h1>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">Sınav türlerini, dersleri, soru sayılarını ve götürme oranlarını yönetin</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button id="btnClearAllExams" class="btn btn-danger">Tüm Denemelerimi Temizle (Sıfırla)</button>
+                </div>
+            </div>
+
+            <!-- İki Kolonlu Orijinal Layout -->
+            <div class="settings-layout-container">
+
+                <!-- SOL: Sınav Türü Listesi -->
+                <div class="table-card" style="padding:1.1rem; align-self:start;">
+                    <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-secondary); margin-bottom:0.85rem; text-transform:uppercase; letter-spacing:0.05em;">Sınav Türleri</h3>
+                    <ul id="settingsExamTypeList" class="settings-exam-type-list" style="margin-bottom:0.75rem;"></ul>
+                    <button type="button" id="btnNewExamType" class="btn btn-secondary" style="width:100%; justify-content:center;">+ Yeni Sınav Türü Ekle</button>
+                </div>
+
+                <!-- SAĞ: Detay Formu -->
+                <div class="table-card" id="settingsExamTypeDetail" style="padding:1.25rem;">
+                    <h3 id="selectedExamTypeTitle" style="font-size:1.05rem; margin-bottom:1.25rem; color:var(--accent-blue);">Sınav Türü Detayları</h3>
+                    <form id="examTypeSettingsForm">
+                        <input type="hidden" id="editExamTypeId">
+
+                        <!-- 4 kolonlu bilgi grid -->
+                        <div class="settings-form-grid">
+                            <div>
+                                <label style="display:block; margin-bottom:0.35rem; font-size:0.78rem; font-weight:600; color:var(--text-secondary);">Sınav Adı</label>
+                                <input type="text" id="editExamTypeName" class="text-input" style="width:100%;" placeholder="Örn: YKS - TYT" required>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:0.35rem; font-size:0.78rem; font-weight:600; color:var(--text-secondary);">Götürme Oranı</label>
+                                <input type="number" id="editPenaltyDivisor" class="text-input" style="width:100%;" step="0.5" min="1" placeholder="4" required>
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:0.35rem; font-size:0.78rem; font-weight:600; color:var(--text-secondary);">Hedef Toplam Net</label>
+                                <input type="number" id="editTargetNet" class="text-input" style="width:100%;" step="0.5" min="0" placeholder="0">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:0.35rem; font-size:0.78rem; font-weight:600; color:var(--text-secondary);">Resmi Sınav Tarihi</label>
+                                <input type="date" id="editExamDate" class="text-input" style="width:100%;">
+                            </div>
+                        </div>
+
+                        <!-- Ders Yapısı -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin:1.25rem 0 0.75rem;">
+                            <h4 style="font-size:0.95rem; font-weight:700;">Ders Yapısı</h4>
+                            <button type="button" id="btnAddCourseRow" class="btn btn-secondary btn-sm">+ Ders Ekle</button>
+                        </div>
+                        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:1.25rem;">
+                            <table class="custom-table" style="min-width:460px; width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:36px;"></th>
+                                        <th>DERS ADI</th>
+                                        <th style="width:100px;">SORU SAYISI</th>
+                                        <th style="width:100px;">HEDEF NET</th>
+                                        <th>GRUP ADI</th>
+                                        <th style="width:44px; text-align:center;">SİL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editCourseRowsBody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Alt Butonlar -->
+                        <div class="settings-action-buttons" style="display:flex; justify-content:flex-end; gap:0.75rem; flex-wrap:wrap;">
+                            <button type="button" class="btn btn-danger" id="btnDeleteExamType">Sınav Türünü Sil</button>
+                            <button type="submit" class="btn btn-primary" style="font-weight:700;">Değişiklikleri Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- /.settings-layout-container -->
+        </section>
+
+
+        <!-- 8. KULLANIM KILAVUZU PAGE -->
+        <section id="page-guide" class="page-view" style="display:none;">
+            <div class="header-bar">
+                <div style="display:flex; align-items:center; gap:0.85rem;">
+                    <button type="button" class="btn btn-secondary btn-sm desktop-only-menu-btn" onclick="App.toggleSidebar()" style="font-weight:700; padding:0.5rem 0.95rem; font-size:0.85rem; flex-shrink:0;">
+                        Menü
+                    </button>
+                    <div>
+                        <h1 class="page-title">Kullanım Kılavuzu</h1>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">PusulamNet'in sunduğu tüm özellikler ve nasıl kullanılacağı</p>
+                    </div>
+                </div>
+                <div class="header-controls">
+                    <button onclick="App.navigateTo('dashboard')" class="btn btn-secondary">
+                        Ana Panele Dön
+                    </button>
+                </div>
+            </div>
+
+            <!-- Genel Tanıtım -->
+            <div class="table-card" style="margin-bottom:1.25rem; padding:1.5rem;">
+                <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:0.6rem; color:var(--accent-blue);">PusulamNet Nedir?</h2>
+                <p style="color:var(--text-secondary); line-height:1.7; font-size:0.9rem;">
+                    PusulamNet, YKS, LGS, KPSS, TUS gibi sınavlara hazırlanan öğrenciler için geliştirilmiş
+                    kapsamlı bir deneme takip ve analiz platformudur. Çözdüğünüz denemelerden elde ettiğiniz
+                    sonuçları sisteme girerek performansınızı görselleştirin, zayıf noktalarınızı tespit edin
+                    ve hedefinize ulaşmak için veriye dayalı kararlar alın.
+                </p>
+            </div>
+
+            <!-- Özellik Kartları -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Ana Panel</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Tüm denemelerinizin özet istatistiklerini tek ekranda görüntüleyin.
+                        Son deneme neti, genel ortalama, en yüksek ve en düşük net ile gelişim trendini takip edin.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Yeni Deneme Ekle</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Çözdüğünüz her denemeden sonra ders bazında doğru, yanlış ve boş sayılarını girin.
+                        Sistem net puanlarınızı anlık olarak hesaplar.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Deneme Geçmişi</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Kaydettiğiniz tüm denemeleri kronolojik sırayla listeleyin.
+                        Her denemenin detaylarını inceleyin, düzenleyin veya silin.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Ders Analizi</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Tek bir derse odaklanarak o dersteki net gelişiminizi çizgi grafikte izleyin.
+                        Ortalama net, en iyi performans ve ders bazlı öneriler alın.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Hedef Takibi</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Sınav türünüz ve her ders için hedef netler belirleyin.
+                        Mevcut ortalamanızın hedefinize ne kadar yaklaştığını anlık izleyin.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Genel Rapor</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Seçtiğiniz sınav türüne ait tüm denemelerin özet raporunu görüntüleyin.
+                        Raporu CSV veya Excel olarak indirip arşivleyin.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Sınav Zamanlayıcısı</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Gerçek sınav modu ile resmi sınav sürelerinde deneme çözün,
+                        Pomodoro odaklanma seansları yapın veya serbest kronometre tutun.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Notlar ve Planlama</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Ders notlarınızı, formülleri ve yanlış sorularınızı kategorilere ayırarak saklayın.
+                        Haftalık çalışma planınızı ve görev listenizi takip edin.
+                    </p>
+                </div>
+
+                <div class="table-card" style="padding:1.25rem;">
+                    <h3 style="font-size:0.98rem; font-weight:700; margin-bottom:0.5rem; color:var(--text-primary);">Sınav Ayarları</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; line-height:1.6;">
+                        Sınav türlerini, dersleri, soru sayılarını, ceza katsayılarını ve hedef netleri
+                        kendi çalışma sisteminize göre özelleştirin.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Giriş çağrısı -->
+            <div style="text-align:center; padding:1.75rem 1.25rem; background:linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.08)); border:1px solid rgba(59,130,246,0.2); border-radius:var(--radius-lg); margin-bottom:1.5rem;">
+                <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:0.5rem;">Hazır mısınız?</h3>
+                <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.88rem;">
+                    Ücretsiz hesap oluşturarak tüm özellikleri kullanmaya hemen başlayın.
+                </p>
+                <button class="btn btn-primary" style="padding:0.65rem 2rem; font-weight:700;" onclick="App.showAuthModal()">
+                    Hesap Oluştur / Giriş Yap
+                </button>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- Auth Modal (Kayıt Ol / Giriş Yap) -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal-container" style="max-width: 440px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="authModalTitle">Oturum Aç</h3>
+            <button id="authModalCloseBtn" title="Kapat (ESC)"
+                style="background:rgba(255,255,255,0.08); border:1px solid var(--border-color); color:var(--text-primary); font-size:1.25rem; line-height:1; cursor:pointer; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.18)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.08)'"
+                onclick="App.hideAuthModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Tabs -->
+            <div style="display:flex; border-bottom:1px solid var(--border-color); margin-bottom:1.25rem;">
+                <button type="button" id="tabLogin" class="btn btn-secondary" style="flex:1; border-radius:var(--radius-md) var(--radius-md) 0 0; background:var(--bg-secondary); border-bottom:2px solid var(--accent-blue); font-weight:700;">Giriş Yap</button>
+                <button type="button" id="tabRegister" class="btn btn-secondary" style="flex:1; border-radius:var(--radius-md) var(--radius-md) 0 0; opacity:0.7;">Kayıt Ol</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">E-Posta Adresi</label>
+                    <input type="email" id="loginEmail" class="text-input" style="width:100%;" placeholder="ogrenci@pusulam.net" required>
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Şifre</label>
+                    <input type="password" id="loginPassword" class="text-input" style="width:100%;" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Giriş Yap</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display:none;">
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Adınız Soyadınız</label>
+                    <input type="text" id="registerName" class="text-input" style="width:100%;" placeholder="Örn: Ahmet Yılmaz" required>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">E-Posta Adresi</label>
+                    <input type="email" id="registerEmail" class="text-input" style="width:100%;" placeholder="ogrenci@pusulam.net" required>
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block; margin-bottom:0.4rem; font-size:0.85rem; font-weight:600;">Şifre (Min 4 Karakter)</label>
+                    <input type="password" id="registerPassword" class="text-input" style="width:100%;" placeholder="••••••••" minlength="4" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="width:100%; justify-content:center;">Hesap Oluştur</button>
+            </form>
+
+            <!-- Misafir olarak devam et -->
+            <div style="text-align:center; margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border-color);">
+                <button type="button" id="btnContinueAsGuest" onclick="App.hideAuthModal()" style="background:none; border:none; color:var(--text-muted); font-size:0.82rem; cursor:pointer; text-decoration:underline; padding:0.25rem;">
+                    Şimdilik girişsiz uygulamayı gez →
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Generic Modal (Detaylar, Silme Onayı vs) -->
+<div class="modal-overlay" id="genericModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Modal Başlığı</h3>
+            <button class="close-btn" id="modalCloseBtn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+    </div>
+</div>
+
+
+
+    <!-- MODAL: CREATE / EDIT STUDY NOTE -->
+    <div id="modalNoteEditor" class="modal-overlay">
+        <div class="modal-card" style="max-width:720px; width:92%;">
+
+            <div class="modal-header">
+                <h3 class="modal-title" id="noteEditorModalTitle">Yeni Ders Notu Ekle</h3>
+                <button type="button" class="close-btn" onclick="App.closeNoteEditorModal()">&times;</button>
+            </div>
+            <form id="noteEditorForm">
+                <input type="hidden" id="noteEditId" value="">
+                <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+                    <div>
+                        <label class="form-label">Not Başlığı</label>
+                        <input type="text" id="noteTitleInput" class="form-control" placeholder="Örn: Türev Alma Kuralları ve Püf Noktalar" required>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                        <div>
+                            <label class="form-label">İlgili Ders</label>
+                            <select id="noteCourseSelect" class="form-control">
+                                <option value="">Genel Not</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Not Türü</label>
+                            <select id="noteTypeSelect" class="form-control">
+                                <option value="general">Ders Notu</option>
+                                <option value="formula">Formül & Püf Noktası</option>
+                                <option value="mistake">Yanlış Sorular / Eksikler</option>
+                                <option value="reminder">Önemli Hatırlatma</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Not İçeriği</label>
+                        <textarea id="noteContentInput" class="form-control" rows="5" placeholder="Not detaylarını buraya yazabilirsiniz..." required style="resize:vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeNoteEditorModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<!-- Application Javascript -->
+            }
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/exam-types/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            if (!res.ok) throw new Error('Silme hatası');
+            alert('Sınav türü silindi.');
+            await this.load();
+        } catch (err) {
+            alert('Hata: ' + err.message);
+        }
+    }
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
